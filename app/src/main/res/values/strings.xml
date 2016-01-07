@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Events</string>
+    <string name="server">http://192.168.72.172</string>
+</resources>
