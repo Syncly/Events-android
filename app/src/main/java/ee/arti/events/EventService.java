@@ -15,6 +15,7 @@ import com.google.android.gms.gcm.GcmListenerService;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 
 public class EventService extends GcmListenerService {
 
@@ -25,15 +26,37 @@ public class EventService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        Log.i(TAG, "onMessageReceived, from: "+from);
+        Log.i(TAG, "onMessageReceived, from: " + from);
 
         //Log.d(TAG, "Starting Thread");
         //new Thread(new mThread()).start();
 
-        Log.d(TAG, "Showing message");
-        sendNotification(data.getString("event"), data.getString("title"));
+        //Log.d(TAG, "Showing message");
+        //sendNotification(data.getString("event"), data.getString("title"));
 
-        DownloadService.startDownloadUrl(this, data.getString("title"), data.getString("url"));
+        // format id's for different formats
+        HashSet<String> ogg = new HashSet<>();
+        ogg.add("172");
+        ogg.add("171");
+
+        HashSet<String> m4a =  new HashSet<>();
+        m4a.add("141");
+        m4a.add("140");
+
+        String formatId = data.getString("format_id");
+
+        StringBuilder fileName = new StringBuilder(data.getString("title"));
+        fileName.append("-");
+        fileName.append(data.getString("_id"));
+        if (ogg.contains(formatId)) {
+            fileName.append(".ogg");
+        } else if (m4a.contains(formatId)) {
+            fileName.append(".m4a");
+        } else {
+            fileName.append(".mkv");  // a bad fallback
+        }
+
+        DownloadService.startDownloadUrl(this, data.getString("title"), data.getString("url"), fileName.toString());
     }
 
     public class mThread implements Runnable {
